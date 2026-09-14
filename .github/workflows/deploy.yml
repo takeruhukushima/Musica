@@ -20,9 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # バージョンは package.json の packageManager (pnpm@11.15.0) を正とする。
+      # ここで version を指定すると二重指定で ERR_PNPM_BAD_PM_VERSION になる。
       - uses: pnpm/action-setup@v4
-        with:
-          version: 11
       - uses: actions/setup-node@v4
         with:
           node-version: 22
