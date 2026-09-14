@@ -1,3 +1,5 @@
+# esbuild(Vite) と sharp(Astro 画像サービス) のビルドスクリプト実行を許可する。
+# 未許可だと CI の pnpm install が ERR_PNPM_IGNORED_BUILDS で失敗する。
 allowBuilds:
-  esbuild: set this to true or false
-  sharp: set this to true or false
+  esbuild: true
+  sharp: true
