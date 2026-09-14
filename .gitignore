@@ -1,0 +1,22 @@
+# build output
+dist/
+# generated types
+.astro/
+# dependencies
+node_modules/
+# logs
+npm-debug.log*
+pnpm-debug.log*
+# environment
+.env
+.env.production
+# macOS
+.DS_Store
+# python (abc2xml をローカル実行した際の生成物)
+__pycache__/
+*.pyc
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/.playwright/

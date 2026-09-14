@@ -1,0 +1,33 @@
+---
+// MAGI
+import '../styles/global.css';
+const { title = 'Musica', description = '楽譜を本人のアカウントで公開し、Webで表示・確認再生する' } = Astro.props;
+// base の末尾スラッシュ有無に関わらず正しく結合する（/Musicaimport/ のような不正を防ぐ）
+const href = (p = '') => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${p}`.replace(/([^:]\/)\/+/g, '$1');
+// 絵文字ファビコン（音符）
+const favicon =
+  "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>";
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href={favicon} />
+  </head>
+  <body>
+    <header class="site">
+      <span class="brand">🎵 Musica</span>
+      <nav>
+        <a href={href()}>ホーム</a>
+        <a href={href('import/')}>取り込み</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>
+<!-- /MAGI -->

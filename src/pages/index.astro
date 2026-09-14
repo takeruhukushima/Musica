@@ -1,0 +1,36 @@
+---
+// MAGI
+import Layout from '../layouts/Layout.astro';
+const href = (p = '') => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${p}`.replace(/([^:]\/)\/+/g, '$1');
+---
+<Layout title="Musica — 楽譜を貼って、表示して、確認再生する">
+  <div class="container home">
+    <h1>🎵 Musica</h1>
+    <p class="lead">
+      楽譜（MusicXML / ABC）を貼り付けると、その場で譜面を描画し、記譜された音を確認再生できます。
+      ログインは不要です。
+    </p>
+    <p>
+      <a class="btn primary" href={href('import/')}>取り込み画面をひらく</a>
+    </p>
+
+    <h2>できること（第1段階）</h2>
+    <ul>
+      <li>MusicXML・圧縮 MusicXML（.mxl）・ABC を貼り付け／ドロップして取り込み</li>
+      <li>五線譜の描画（大譜表・複数パート・和音・臨時記号・タイ・三連符・コードシンボル・歌詞など）</li>
+      <li>記譜された音の確認再生と、再生位置の譜面ハイライト</li>
+      <li>安全性: 悪意ある XML・圧縮ファイルを検出して取り込まない</li>
+    </ul>
+
+    <h2>確認再生について</h2>
+    <p class="muted">
+      再生は「演奏の再現」ではなく、記譜された音高と音価を耳で確かめるための手段です。
+      コードシンボルは表示のみで音に変換せず、書かれていない伴奏を生成しません。
+    </p>
+
+    <p class="muted small">
+      公開（自分の AT Protocol アカウントへの保存）・共有・エージェント連携は後続段階で提供します。
+    </p>
+  </div>
+</Layout>
+<!-- /MAGI -->

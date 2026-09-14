@@ -1,0 +1,35 @@
+{
+  "name": "musica",
+  "type": "module",
+  "version": "0.4.0",
+  "private": true,
+  "packageManager": "pnpm@11.15.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@astrojs/preact": "^4.0.4",
+    "@tonejs/midi": "^2.0.28",
+    "astro": "^5.6.1",
+    "dompurify": "^3.2.4",
+    "fflate": "^0.8.2",
+    "preact": "^10.26.4",
+    "smplr": "^0.16.2",
+    "verovio": "^4.3.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^26.5.1",
+    "happy-dom": "^17.4.4",
+    "jsdom": "^30.0.1",
+    "typescript": "^5.8.2",
+    "vitest": "^3.1.1"
+  }
+}

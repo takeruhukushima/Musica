@@ -1,0 +1,11 @@
+---
+// MAGI
+import Layout from '../layouts/Layout.astro';
+import { ImportStudio } from '../components/ImportStudio';
+---
+<Layout title="取り込み — Musica">
+  <div class="container import-page">
+    <ImportStudio client:only="preact" />
+  </div>
+</Layout>
+<!-- /MAGI -->
