@@ -61,6 +61,29 @@ describe('buildScoreRecord（§9）', () => {
     expect(rec.editSource).toBeDefined();
   });
 
+  it('durationSec を整数へ丸める（DAG-CBOR は float 不可）', () => {
+    const rec = buildScoreRecord({
+      title: 'x',
+      source: fakeBlob,
+      sourceFormat: 'musicxml',
+      sourceName: 'x.musicxml',
+      durationSec: 54.857088000000005,
+    });
+    expect(rec.durationSec).toBe(55);
+    expect(Number.isInteger(rec.durationSec)).toBe(true);
+  });
+
+  it('非有限な durationSec はフィールドごと落とす', () => {
+    const rec = buildScoreRecord({
+      title: 'x',
+      source: fakeBlob,
+      sourceFormat: 'musicxml',
+      sourceName: 'x.musicxml',
+      durationSec: Number.NaN,
+    });
+    expect('durationSec' in rec).toBe(false);
+  });
+
   it('createdAt を渡すと更新時も作成日時を引き継ぐ', () => {
     const rec = buildScoreRecord({
       title: 'x',
