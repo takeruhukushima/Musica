@@ -2,43 +2,94 @@
 // MAGI
 import Layout from '../layouts/Layout.astro';
 const href = (p = '') => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${p}`.replace(/([^:]\/)\/+/g, '$1');
+
+// ヒーローの装飾譜面（音楽フォント・描画エンジンを読み込まない軽量な自作 SVG / §15）。
+// 上行スケールの音符。テーマに追従するよう currentColor を使う。
+const staffLines = [36, 58, 80, 102, 124];
+const notes = [
+  { x: 78, y: 124 },
+  { x: 116, y: 113 },
+  { x: 154, y: 102 },
+  { x: 192, y: 91 },
+  { x: 230, y: 80 },
+  { x: 268, y: 69 },
+  { x: 306, y: 58 },
+  { x: 344, y: 47 },
+];
 ---
-<Layout title="Musica — 楽譜を貼って、表示して、確認再生する">
+<Layout title="Musica — 楽譜を貼って、鳴らして、自分の名義で公開する">
+  <section class="hero">
+    <div class="hero-inner container">
+      <div class="hero-copy">
+        <p class="eyebrow">MusicXML · ABC · AT Protocol</p>
+        <h1 class="hero-title">
+          楽譜を、貼って、鳴らして、<br />
+          <span class="accent">自分の名義で公開する。</span>
+        </h1>
+        <p class="hero-lead">
+          MusicXML / ABC を貼り付ければ、その場で譜面を描画して確認再生。
+          そのまま <strong>あなたの AT Protocol アカウント</strong> へ、運営に預けずに公開できます。
+        </p>
+        <div class="hero-cta">
+          <a class="btn primary lg" href={href('import/')}>取り込み画面をひらく</a>
+          <a class="btn ghost lg" href={href('mine/')}>マイ楽譜を見る</a>
+        </div>
+        <p class="hero-note">
+          ログイン不要で <b>貼る → 描く → 鳴らす</b>。公開するときだけログインを求めます。
+        </p>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <svg viewBox="0 0 400 168" role="presentation" xmlns="http://www.w3.org/2000/svg">
+          {staffLines.map((y) => (
+            <line class="staff-line" x1="20" y1={y} x2="380" y2={y} />
+          ))}
+          <line class="bar" x1="24" y1="36" x2="24" y2="124" />
+          <line class="bar" x1="376" y1="36" x2="376" y2="124" />
+          {notes.map((n, i) => (
+            <g class="note" style={`--d:${i * 90}ms`}>
+              <line class="stem" x1={n.x + 8} y1={n.y - 2} x2={n.x + 8} y2={n.y - 48} />
+              <ellipse class="head" cx={n.x} cy={n.y} rx="8.5" ry="6" transform={`rotate(-20 ${n.x} ${n.y})`} />
+            </g>
+          ))}
+        </svg>
+      </div>
+    </div>
+  </section>
+
   <div class="container home">
-    <h1>🎵 Musica</h1>
-    <p class="lead">
-      楽譜（MusicXML / ABC）を貼り付けると、その場で譜面を描画し、記譜された音を確認再生できます。
-      ログインは不要です。
-    </p>
-    <p>
-      <a class="btn primary" href={href('import/')}>取り込み画面をひらく</a>
-    </p>
+    <div class="feature-grid">
+      <article class="card">
+        <h2>貼る → 鳴らす</h2>
+        <ul>
+          <li>MusicXML・圧縮 MusicXML（.mxl）・ABC を貼り付け／ドロップ、形式は自動判別</li>
+          <li>五線譜の描画（大譜表・複数パート・和音・臨時記号・タイ・三連符・コードシンボル・歌詞）</li>
+          <li>記譜された音の確認再生と、再生位置の譜面ハイライト</li>
+          <li>悪意ある XML・圧縮ファイルを検出して取り込まない</li>
+        </ul>
+      </article>
 
-    <h2>できること（第1段階）</h2>
-    <ul>
-      <li>MusicXML・圧縮 MusicXML（.mxl）・ABC を貼り付け／ドロップして取り込み</li>
-      <li>五線譜の描画（大譜表・複数パート・和音・臨時記号・タイ・三連符・コードシンボル・歌詞など）</li>
-      <li>記譜された音の確認再生と、再生位置の譜面ハイライト</li>
-      <li>安全性: 悪意ある XML・圧縮ファイルを検出して取り込まない</li>
-    </ul>
+      <article class="card">
+        <h2>自分の名義で公開</h2>
+        <ul>
+          <li>AT Protocol でログインし、楽譜を <strong>本人の PDS</strong> へ公開</li>
+          <li>原本は常に MusicXML。ABC は原文も編集用ソースとして保存</li>
+          <li><a href={href('mine/')}>マイ楽譜</a>で一覧・原本表示・更新・削除（変更前 CID で競合検出）</li>
+          <li>公開前はログイン不要で端末内に下書き・書き出し</li>
+        </ul>
+      </article>
+    </div>
 
-    <h2>公開（第2段階）</h2>
-    <ul>
-      <li>AT Protocol アカウントでログインし、取り込んだ楽譜を<strong>本人の PDS</strong> へ公開</li>
-      <li>原本は常に MusicXML。ABC 投稿時は ABC 原文も編集用ソースとして保存</li>
-      <li><a href={href('mine/')}>マイ楽譜</a>で自作品の一覧・原本表示・更新・削除（変更前 CID で競合検出）</li>
-      <li>公開前はログイン不要で端末内に下書き保存・書き出し</li>
-    </ul>
-
-    <h2>確認再生について</h2>
-    <p class="muted">
-      再生は「演奏の再現」ではなく、記譜された音高と音価を耳で確かめるための手段です。
-      コードシンボルは表示のみで音に変換せず、書かれていない伴奏を生成しません。
-    </p>
-
-    <p class="muted small">
-      共有（Bluesky 投稿）・作者ページ・エージェント連携（MCP）は後続段階で提供します。
-    </p>
+    <section class="note-block">
+      <h2>確認再生について</h2>
+      <p class="muted">
+        再生は「演奏の再現」ではなく、記譜された音高と音価を耳で確かめるための手段です。
+        コードシンボルは表示のみで音に変換せず、書かれていない伴奏を生成しません。
+      </p>
+      <p class="muted small">
+        共有（Bluesky 投稿）・作者ページ・エージェント連携（MCP）は後続段階で提供します。
+      </p>
+    </section>
   </div>
 </Layout>
 <!-- /MAGI -->
