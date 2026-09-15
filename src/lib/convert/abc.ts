@@ -79,6 +79,58 @@ async function loadRuntime(): Promise<PyodideLike> {
   return runtimePromise;
 }
 
+/**
+ * 声部フィールドの正規化（abc2xml 245 の制限への対応）。
+ *
+ * 背景: ABC の本文では `V:1 CDEF |` のように「声部フィールド + 同一行の音楽」が広く使われる
+ * （abcm2ps 等が受理し、AI 生成 ABC でも頻出）。しかし採用中の abc2xml 245 はこの形を
+ * 声部宣言としてのみ解釈し、同一行の音楽を捨てて「empty voice」として黙って欠落させる。
+ * 結果、多声部 ABC の音符が一切変換されないバグになる（§6 変換の欠落は実用水準の判定対象）。
+ *
+ * 対応: 本文中の `V:<id> <音楽>` 行を、abc2xml が正しく扱うインライン形 `[V:<id>] <音楽>` へ
+ * 書き換える。`V:1 clef=treble` のような属性のみの声部定義行はそのまま残す（声部の切替・定義）。
+ * すでにインライン形 `[V:...]` の行や、本文前（チューンヘッダ）の行は対象外。
+ *
+ * これは純粋なデータ変換であり原本の意味を変えない。原文 ABC は editSource として別に保持するため
+ * （§9 / AC-12）、この正規化は変換に渡すコピーにのみ適用する。
+ */
+// 声部フィールドの値として現れる属性キー（音楽ではなく声部定義）。
+const VOICE_PROP_KEYS = new Set([
+  'clef', 'name', 'nm', 'subname', 'snm', 'sname', 'stem', 'stems', 'gstem',
+  'octave', 'transpose', 'middle', 'merge', 'up', 'down', 'space', 'bracket',
+  'brace', 'gchord', 'dyn', 'lyrics', 'scale', 'staffscale', 'stafflines',
+]);
+
+function isVoicePropertyBody(rest: string): boolean {
+  const toks = rest.trim().split(/\s+/);
+  if (toks.length === 0) return false;
+  return toks.every((t) => {
+    const eq = t.indexOf('=');
+    if (eq <= 0) return false;
+    return VOICE_PROP_KEYS.has(t.slice(0, eq).toLowerCase());
+  });
+}
+
+export function normalizeAbcVoices(abc: string): string {
+  const lines = abc.split(/\n/);
+  let inBody = false;
+  return lines
+    .map((line) => {
+      // 最初の K: 行で本文が始まる（それ以降は key 変更を含めても本文扱い）。
+      if (!inBody) {
+        if (/^K:/.test(line)) inBody = true;
+        return line;
+      }
+      // 本文の `V:<id> <rest>`（インライン形 [V:...] や属性のみは対象外）。
+      const m = /^V:\s*(\S+)([ \t]+)(\S.*)$/.exec(line);
+      if (!m) return line;
+      const rest = m[3];
+      if (isVoicePropertyBody(rest)) return line; // 声部定義（clef= 等）は残す
+      return `[V:${m[1]}]${m[2]}${rest}`;
+    })
+    .join('\n');
+}
+
 /** 変換前の軽量な入力上限チェック（§6） */
 function precheck(abc: string): Issue | null {
   if (abc.length > LIMITS.maxAbcChars) {
@@ -109,7 +161,8 @@ export async function convertAbcToMusicXml(abc: string): Promise<AbcConvertResul
   }
 
   try {
-    pyodide.globals.set('abc_input', abc);
+    // 同一行の声部フィールド + 音楽（`V:1 CDEF |`）を abc2xml が扱えるインライン形へ正規化する。
+    pyodide.globals.set('abc_input', normalizeAbcVoices(abc));
     // getXmlScores（DOCTYPE 挿入）ではなく getXmlDocs + ElementTree を使う。
     const code = [
       'import abc2xml, xml.etree.ElementTree as ET',

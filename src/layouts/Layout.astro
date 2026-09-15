@@ -1,6 +1,7 @@
 ---
 // MAGI
 import '../styles/global.css';
+import { AuthBar } from '../components/AuthBar';
 const { title = 'Musica', description = '楽譜を本人のアカウントで公開し、Webで表示・確認再生する' } = Astro.props;
 // base の末尾スラッシュ有無に関わらず正しく結合する（/Musicaimport/ のような不正を防ぐ）
 const href = (p = '') => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${p}`.replace(/([^:]\/)\/+/g, '$1');
@@ -23,7 +24,9 @@ const favicon =
       <nav>
         <a href={href()}>ホーム</a>
         <a href={href('import/')}>取り込み</a>
+        <a href={href('mine/')}>マイ楽譜</a>
       </nav>
+      <AuthBar client:only="preact" />
     </header>
     <main>
       <slot />

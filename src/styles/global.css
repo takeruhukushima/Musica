@@ -60,6 +60,26 @@ header.site {
 header.site .brand { font-weight: 700; font-size: 1.1rem; letter-spacing: 0.02em; }
 header.site nav { margin-left: auto; display: flex; gap: 1rem; }
 
+/* --- 認証バー（§9） --- */
+.authbar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.authbar.signin .handle {
+  font: inherit;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--fg);
+  min-width: 12rem;
+}
+.authbar .who { font-size: 0.9rem; color: var(--muted); max-width: 16rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn.small { padding: 0.25rem 0.6rem; font-size: 0.85rem; }
+.btn.danger { color: var(--error-fg); border-color: color-mix(in srgb, var(--error-fg) 40%, var(--line)); }
+.btn.danger:hover { border-color: var(--error-fg); }
+@media (max-width: 700px) {
+  header.site { flex-wrap: wrap; }
+  .authbar { width: 100%; }
+}
+
 .btn {
   font: inherit;
   padding: 0.4rem 0.9rem;
@@ -167,4 +187,51 @@ body { overflow-x: hidden; }
 .seek { width: 100%; margin: 0.5rem 0; }
 .volume { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--muted); }
 .playback .note { color: var(--muted); font-size: 0.82rem; margin: 0.5rem 0 0; }
+
+/* --- 公開パネル（§9 / §12） --- */
+.publish { margin-top: 0.9rem; border-top: 1px solid var(--line); padding-top: 0.75rem; }
+.publish h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+.publish .fields { display: flex; flex-direction: column; gap: 0.5rem; }
+.publish label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.85rem; color: var(--muted); }
+.publish .req { color: var(--error-fg); font-size: 0.75rem; margin-left: 0.4rem; }
+.publish input, .publish textarea {
+  font: inherit;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--fg);
+  width: 100%;
+}
+.publish textarea { resize: vertical; font-family: var(--mono); font-size: 0.82rem; }
+.publish .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.publish .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+@media (max-width: 560px) { .publish .row2, .publish .row3 { grid-template-columns: 1fr; } }
+.publish-actions { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.7rem; flex-wrap: wrap; }
+.publish-msg { margin: 0.6rem 0 0; padding: 0.5rem 0.7rem; border-radius: var(--radius); font-size: 0.9rem; }
+.publish-msg.error { background: var(--error-bg); color: var(--error-fg); }
+.publish-msg.done { background: var(--warn-bg); color: var(--warn-fg); }
+.publish-msg .uri { font-family: var(--mono); font-size: 0.8rem; word-break: break-all; }
+
+/* --- マイ楽譜（§12） --- */
+.myscores-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
+.score-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.score-item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.75rem;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.score-item-main { display: flex; flex-direction: column; gap: 0.1rem; }
+.score-item-main strong { font-size: 1rem; }
+.score-item-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.inline-score { margin-top: 0.4rem; }
+@media (min-width: 640px) {
+  .score-item { flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .score-item-main { flex: 1; }
+  .inline-score { flex-basis: 100%; }
+}
 /* /MAGI */

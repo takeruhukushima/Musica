@@ -1,0 +1,13 @@
+---
+// MAGI
+import Layout from '../layouts/Layout.astro';
+import { MyScores } from '../components/MyScores';
+---
+<Layout title="マイ楽譜 — Musica">
+  <div class="container">
+    <h1>マイ楽譜</h1>
+    <p class="muted">本人の AT Protocol アカウント（PDS）に保存した公開作品の一覧です。</p>
+    <MyScores client:only="preact" />
+  </div>
+</Layout>
+<!-- /MAGI -->

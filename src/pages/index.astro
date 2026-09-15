@@ -22,6 +22,14 @@ const href = (p = '') => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${p}`.r
       <li>安全性: 悪意ある XML・圧縮ファイルを検出して取り込まない</li>
     </ul>
 
+    <h2>公開（第2段階）</h2>
+    <ul>
+      <li>AT Protocol アカウントでログインし、取り込んだ楽譜を<strong>本人の PDS</strong> へ公開</li>
+      <li>原本は常に MusicXML。ABC 投稿時は ABC 原文も編集用ソースとして保存</li>
+      <li><a href={href('mine/')}>マイ楽譜</a>で自作品の一覧・原本表示・更新・削除（変更前 CID で競合検出）</li>
+      <li>公開前はログイン不要で端末内に下書き保存・書き出し</li>
+    </ul>
+
     <h2>確認再生について</h2>
     <p class="muted">
       再生は「演奏の再現」ではなく、記譜された音高と音価を耳で確かめるための手段です。
@@ -29,7 +37,7 @@ const href = (p = '') => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${p}`.r
     </p>
 
     <p class="muted small">
-      公開（自分の AT Protocol アカウントへの保存）・共有・エージェント連携は後続段階で提供します。
+      共有（Bluesky 投稿）・作者ページ・エージェント連携（MCP）は後続段階で提供します。
     </p>
   </div>
 </Layout>

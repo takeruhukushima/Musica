@@ -1,5 +1,8 @@
 # esbuild(Vite) と sharp(Astro 画像サービス) のビルドスクリプト実行を許可する。
 # 未許可だと CI の pnpm install が ERR_PNPM_IGNORED_BUILDS で失敗する。
+# core-js の postinstall は寄付案内の表示のみでビルド不要のため明示的に拒否する
+# （@atproto/oauth-client-browser 経由で入る）。
 allowBuilds:
+  core-js: false
   esbuild: true
   sharp: true

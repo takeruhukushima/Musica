@@ -13,6 +13,10 @@ import { toFriendlyList, type FriendlyError } from '../lib/errors/musicalErrors'
 import { detectText } from '../lib/detect';
 import { PlaybackControls } from './PlaybackControls';
 import { ErrorPanel, WarningPanel } from './ErrorPanel';
+import { PublishPanel, type PublishContent } from './PublishPanel';
+import { extractWorkInfo } from '../lib/atproto/summary';
+import { takeEditHandoff, type EditHandoff } from '../lib/editHandoff';
+import type { ScoreMeta } from '../lib/atproto/lexicon';
 
 type Status = 'idle' | 'working' | 'ready' | 'error';
 
@@ -38,6 +42,10 @@ export function ImportStudio() {
   const [volume, setVolume] = useState(0.8);
   const [dragOver, setDragOver] = useState(false);
   const [audioNote, setAudioNote] = useState('');
+  // 公開用: 取り込みに成功した原本と要約、更新対象（マイ楽譜からの編集）。
+  const [content, setContent] = useState<PublishContent | null>(null);
+  const [suggestedMeta, setSuggestedMeta] = useState<ScoreMeta | undefined>(undefined);
+  const [editTarget, setEditTarget] = useState<EditHandoff | null>(null);
 
   const svgRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<ConfirmPlayer | null>(null);
@@ -58,6 +66,16 @@ export function ImportStudio() {
   }
 
   useEffect(() => () => playerRef.current?.dispose(), []);
+
+  // マイ楽譜からの編集ハンドオフ（§5 更新）。editSource（ABC）優先で本文に読み込む。
+  useEffect(() => {
+    const h = takeEditHandoff();
+    if (h) {
+      setEditTarget(h);
+      setSuggestedMeta(h.meta);
+      setText(h.editorText);
+    }
+  }, []);
 
   const process = useCallback(async (input: { text?: string; bytes?: Uint8Array }) => {
     const gen = ++genRef.current;
@@ -87,6 +105,7 @@ export function ImportStudio() {
       if (svgRef.current) svgRef.current.innerHTML = '';
       setDuration(0);
       setPosition(0);
+      setContent(null); // 公開不可（有効な原本が無い）
       return;
     }
 
@@ -109,13 +128,26 @@ export function ImportStudio() {
       setDuration(playerRef.current?.durationSec ?? 0);
       setPosition(0);
       if (svgRef.current) highlighterRef.current = createHighlighter(tk, svgRef.current);
+
+      // 公開用コンテンツを確定（原本は常に MusicXML。ABC なら原文を editSource として保持 / §9）。
+      setContent({
+        musicXml: result.musicXml,
+        editSourceText: result.editSource?.text,
+        editFormat: result.editSource?.format,
+        durationSec: playerRef.current?.durationSec,
+      });
+      // 更新でなければ、原本の作品名・作曲者を公開フォームへプレフィル。
+      if (!editTarget) {
+        const info = extractWorkInfo(result.musicXml);
+        setSuggestedMeta({ title: info.title ?? '', composer: info.composer });
+      }
       setStatus('ready');
     } catch (e) {
       if (gen !== genRef.current) return;
       setStatus('error');
       setErrors([{ message: 'この楽譜を描画できませんでした。', detail: String(e) }]);
     }
-  }, []);
+  }, [editTarget]);
 
   // テキスト入力の debounce（入力停止後に再描画 / §15）
   useEffect(() => {
@@ -123,6 +155,7 @@ export function ImportStudio() {
       setStatus('idle');
       setFormat('unknown');
       setErrors([]);
+      setContent(null);
       if (svgRef.current) svgRef.current.innerHTML = '';
       return;
     }
@@ -227,6 +260,18 @@ export function ImportStudio() {
           />
         )}
         {audioNote && <p class="detect-note" role="alert">♪ {audioNote}</p>}
+
+        {editTarget && (
+          <p class="detect-note" role="status">
+            編集モード: 既存作品を更新します（{editTarget.meta.title}）。公開すると同じ作品URLを維持します。
+          </p>
+        )}
+        <PublishPanel
+          content={content}
+          target={editTarget?.target ?? null}
+          initialMeta={suggestedMeta}
+          createdAt={editTarget?.createdAt}
+        />
       </section>
     </div>
   );
