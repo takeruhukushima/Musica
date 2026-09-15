@@ -107,6 +107,12 @@ export function validateMeta(meta: ScoreMeta): string[] {
   return errs;
 }
 
+/** 有限数を整数へ丸める。null/undefined/非有限は undefined（= フィールドを落とす）。 */
+function toIntOrUndefined(v: number | undefined): number | undefined {
+  if (v == null || !Number.isFinite(v)) return undefined;
+  return Math.round(v);
+}
+
 /** 空文字・空配列を落として任意フィールドを整える */
 function clean<T extends Record<string, unknown>>(obj: T): T {
   const out = {} as Record<string, unknown>;
@@ -143,7 +149,9 @@ export function buildScoreRecord(input: BuildRecordInput): ScoreRecord {
     editSource: input.editSource,
     editFormat: input.editSource ? input.editFormat : undefined,
     parts: input.parts,
-    durationSec: input.durationSec,
+    // AT Protocol のデータモデル（DAG-CBOR）は浮動小数点を許可しない。
+    // durationSec は概算演奏時間なので整数秒へ丸める。非有限値は落とす。
+    durationSec: toIntOrUndefined(input.durationSec),
     createdAt: input.createdAt ?? now,
     updatedAt: now,
     rights: input.rights,
